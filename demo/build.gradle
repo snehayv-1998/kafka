@@ -10,9 +10,8 @@ version = '0.0.1-SNAPSHOT'
 java {
 	sourceCompatibility = '1.8'
 }
-
 repositories {
-	mavenCentral()
+		mavenCentral()
 }
 
 dependencies {
@@ -21,6 +20,9 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka:2.9.5'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+	implementation group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.36'
+	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.3.1'
 }
 
 tasks.named('test') {
