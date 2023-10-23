@@ -1,17 +1,18 @@
 package com.sneha.confluent;
+
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.kstream.*;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Properties;
 
-public class KafkaStreamsBasicExample {
-
+public class KTableExample {
     public static void main(final String[] args) throws IOException {
       /*  if (args.length != 1) {
             System.out.println("Please provide the configuration file path as a command line argument");
@@ -31,11 +32,12 @@ public class KafkaStreamsBasicExample {
         StreamsBuilder builder = new StreamsBuilder();
         final String inputTopic = streamsProps.getProperty("basic.input.topic");
         final String outputTopic = streamsProps.getProperty("basic.output.topic");
-        KStream<String, String> firstStream = builder.stream(inputTopic, Consumed.with(Serdes.String(), Serdes.String()));
-        firstStream.peek((key, value) -> System.out.println("Incoming record - key " +key +" value " + value))
-                .mapValues(value -> value.toUpperCase())
-                .peek((key, value) -> System.out.println("Updated record - key " +key +" value " + value))
-                .to(outputTopic, Produced.with(Serdes.String(), Serdes.String()));
+        KTable<String, String> kTable = builder.table(inputTopic, Materialized.with(Serdes.String(), Serdes.String()));
+        kTable.mapValues(v->v.toUpperCase())
+                .toStream()
+                .peek(((key, value) -> System.out.println("After update : key: "+key+" value: "+value)))
+                .to(outputTopic,Produced.with(Serdes.String(),Serdes.String()));
+
         KafkaStreams kafkaStreams = new KafkaStreams(builder.build(), streamsProps);
         kafkaStreams.start();
     }
